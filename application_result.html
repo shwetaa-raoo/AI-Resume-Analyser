@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+
+{% block title %}Application Result - Resume Analyzer{% endblock %}
+
+{% block content %}
+
+{# ---------------- SAFE SETUP ---------------- #}
+{% set score = application.match_score | int %}
+{% if score < 0 %}{% set score = 0 %}{% endif %}
+{% if score > 100 %}{% set score = 100 %}{% endif %}
+{% set CIRCUMFERENCE = 565.48 %}
+
+<div class="page-header">
+    <div class="container">
+        <h1><i class="fas fa-chart-bar"></i> Application Analysis Result</h1>
+        <p>Your resume has been analyzed against the job requirements</p>
+    </div>
+</div>
+
+<div class="container">
+    <div class="result-wrapper">
+
+        <!-- ================= MATCH SCORE ================= -->
+        <div class="score-card">
+            <div class="score-circle animate" data-score="{{ score }}">
+                <svg viewBox="0 0 200 200">
+                    <circle cx="100" cy="100" r="90" class="score-bg"></circle>
+
+                    <circle
+                        cx="100"
+                        cy="100"
+                        r="90"
+                        class="score-progress"
+                        style="stroke-dasharray: {{ (CIRCUMFERENCE * score / 100) | round(2) }} {{ CIRCUMFERENCE }}"
+                    ></circle>
+                </svg>
+
+                <div class="score-text">
+                    <span class="score-value">{{ score }}%</span>
+                    <span class="score-label">Match</span>
+                </div>
+            </div>
+
+            {% if score >= 80 %}
+                <h3 class="match-status excellent">Excellent Match!</h3>
+                <p>Your profile is highly compatible with this role. Great chances of success!</p>
+            {% elif score >= 60 %}
+                <h3 class="match-status good">Good Match</h3>
+                <p>You have strong qualifications for this position with some areas to improve.</p>
+            {% elif score >= 40 %}
+                <h3 class="match-status moderate">Moderate Match</h3>
+                <p>You meet some requirements but may need to develop additional skills.</p>
+            {% else %}
+                <h3 class="match-status low">Limited Match</h3>
+                <p>This role may require significant additional qualifications.</p>
+            {% endif %}
+        </div>
+
+        <!-- ================= INFO SECTION ================= -->
+        <div class="info-grid">
+
+            <div class="info-card">
+                <h3><i class="fas fa-briefcase"></i> Job Details</h3>
+                <p><strong>Position:</strong> {{ job.title }}</p>
+                <p><strong>Company:</strong> {{ job.company }}</p>
+
+                {% if job.location %}
+                <p><strong>Location:</strong> {{ job.location }}</p>
+                {% endif %}
+            </div>
+
+            <div class="info-card">
+                <h3><i class="fas fa-user"></i> Your Information</h3>
+                <p><strong>Name:</strong> {{ resume.name }}</p>
+                <p><strong>Email:</strong> {{ resume.email }}</p>
+
+                <p>
+                    <strong>Applied:</strong>
+                    {% if application.applied_date %}
+                        {{ application.applied_date.strftime('%b %d, %Y at %I:%M %p') }}
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </p>
+            </div>
+
+        </div>
+
+        <!-- ================= MATCHED SKILLS ================= -->
+        {% if matched_skills %}
+        <div class="analysis-card success-card">
+            <h3>
+                <i class="fas fa-check-circle"></i>
+                Matched Skills ({{ matched_skills | length }})
+            </h3>
+
+            <p class="card-description">
+                Skills from your resume that match the job requirements
+            </p>
+
+            <div class="skills-tags">
+                {% for skill in matched_skills %}
+                    <span class="skill-tag matched">{{ skill }}</span>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- ================= MISSING SKILLS ================= -->
+        {% if missing_skills %}
+        <div class="analysis-card warning-card">
+            <h3>
+                <i class="fas fa-exclamation-triangle"></i>
+                Missing Skills ({{ missing_skills | length }})
+            </h3>
+
+            <p class="card-description">
+                Skills required for this job that were not found in your resume
+            </p>
+
+            <div class="skills-tags">
+                {% for skill in missing_skills %}
+                    <span class="skill-tag missing">{{ skill }}</span>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- ================= RECOMMENDATIONS ================= -->
+        <div class="analysis-card info-card">
+            <h3><i class="fas fa-lightbulb"></i> Personalized Recommendations</h3>
+
+            <p class="card-description">
+                AI-generated suggestions to improve your application
+            </p>
+
+            {% if recommendations %}
+            <ul class="recommendations-list">
+                {% for recommendation in recommendations %}
+                <li>
+                    <i class="fas fa-arrow-right"></i>
+                    {{ recommendation }}
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p class="text-muted">
+                Your resume already aligns well with this job.
+            </p>
+            {% endif %}
+        </div>
+
+        <!-- ================= ACTION BUTTONS ================= -->
+        <div class="result-actions">
+
+            <a href="{{ url_for('candidate_dashboard') }}" class="btn btn-secondary">
+                <i class="fas fa-search"></i> Browse More Jobs
+            </a>
+
+            <a href="{{ url_for('job_details', job_id=job.id) }}" class="btn btn-primary">
+                <i class="fas fa-info-circle"></i> View Job Details
+            </a>
+
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

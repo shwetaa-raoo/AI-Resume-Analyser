@@ -1,0 +1,261 @@
+{% extends "base.html" %}
+
+{% block title %}Applications for {{ job.title }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="container">
+        <h1><i class="fas fa-users"></i> Applications for {{ job.title }}</h1>
+        <p>{{ job.company }} • {{ stats.total }} total applications • Ranked by Match Score</p>
+    </div>
+</div>
+
+<div class="container">
+    {% if applications %}
+        <div class="applications-stats">
+            <div class="stat-box">
+                <i class="fas fa-users"></i>
+                <div>
+                    <span class="stat-number">{{ stats.total }}</span>
+                    <span class="stat-label">Total Applications</span>
+                </div>
+            </div>
+            <div class="stat-box">
+                <i class="fas fa-star"></i>
+                <div>
+                    <span class="stat-number">{{ stats.high_match }}</span>
+                    <span class="stat-label">High Match (≥70%)</span>
+                </div>
+            </div>
+            <div class="stat-box">
+                <i class="fas fa-chart-line"></i>
+                <div>
+                    <span class="stat-number">{{ "%.1f"|format(stats.avg_score) }}%</span>
+                    <span class="stat-label">Average Match</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="applicants-list">
+            <h2><i class="fas fa-trophy"></i> Top Candidates (Ranked by Match Score)</h2>
+            <p style="color: var(--text-light); margin-bottom: 20px;">Candidates are automatically ranked from highest to lowest match score. Focus on top candidates for interviews.</p>
+            
+            {% for application in applications %}
+            <div class="applicant-card {% if application.match_score >= 80 %}top-candidate{% elif application.match_score >= 70 %}high-match{% endif %}">
+                <div class="applicant-header">
+                    <div class="applicant-rank">
+                        <div class="rank-badge">
+                            #{{ loop.index }}
+                        </div>
+                    </div>
+                    <div class="applicant-info">
+                        <div class="applicant-avatar">
+                            {{ application.resume.name[0].upper() }}
+                        </div>
+                        <div>
+                            <h3>{{ application.resume.name }}
+                                {% if application.match_score >= 80 %}
+                                    <span class="badge-icon" title="Top Candidate">⭐</span>
+                                {% endif %}
+                            </h3>
+                            <p class="applicant-contact">
+                                <i class="fas fa-envelope"></i> {{ application.resume.email }}
+                                {% if application.resume.phone %}
+                                    <i class="fas fa-phone" style="margin-left: 15px;"></i> {{ application.resume.phone }}
+                                {% endif %}
+                            </p>
+                            <p class="applicant-date">
+                                <i class="fas fa-calendar"></i> Applied {{ application.applied_date.strftime('%b %d, %Y') }}
+                                <span class="status-indicator status-{{ application.status|lower|replace(' ', '-') }}">
+                                    {{ application.status }}
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="applicant-score">
+                        <div class="score-badge 
+                            {% if application.match_score >= 80 %}excellent
+                            {% elif application.match_score >= 60 %}good
+                            {% elif application.match_score >= 40 %}moderate
+                            {% else %}low{% endif %}">
+                            <span class="score-number">{{ application.match_score }}%</span>
+                            <span class="score-text">Match</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="applicant-details">
+                    <div class="detail-section">
+                        <h4><i class="fas fa-check-circle"></i> Matched Skills</h4>
+                        <div class="skills-tags">
+                            {% set matched = application.matched_skills|from_json %}
+                            {% for skill in matched[:10] %}
+                                <span class="skill-tag matched">{{ skill }}</span>
+                            {% endfor %}
+                            {% if matched|length > 10 %}
+                                <span class="skill-tag">+{{ matched|length - 10 }} more</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    {% set missing = application.missing_skills|from_json %}
+                    {% if missing %}
+                    <div class="detail-section">
+                        <h4><i class="fas fa-exclamation-circle"></i> Missing Skills</h4>
+                        <div class="skills-tags">
+                            {% for skill in missing[:8] %}
+                                <span class="skill-tag missing">{{ skill }}</span>
+                            {% endfor %}
+                            {% if missing|length > 8 %}
+                                <span class="skill-tag">+{{ missing|length - 8 }} more</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if application.resume.experience %}
+                    <div class="detail-section">
+                        <h4><i class="fas fa-briefcase"></i> Experience Highlights</h4>
+                        <p class="experience-text">{{ application.resume.experience[:300] }}{% if application.resume.experience|length > 300 %}...{% endif %}</p>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="applicant-actions">
+                    <a href="/application/{{ application.id }}" class="btn btn-sm btn-primary">
+                        <i class="fas fa-eye"></i> View Full Analysis
+                    </a>
+                    <button class="btn btn-sm btn-secondary" onclick="window.open('/uploads/{{ application.resume.filename }}', '_blank')">
+                        <i class="fas fa-download"></i> Download Resume
+                    </button>
+                    
+                    <!-- HR Action Buttons -->
+                    <div class="hr-actions">
+                        <form method="POST" action="/application/{{ application.id }}/update-status" style="display: inline;">
+                            {% if application.status != 'Interview' %}
+                                <button type="submit" name="status" value="Interview" class="btn btn-sm btn-success" title="Schedule Interview">
+                                    <i class="fas fa-calendar-check"></i> Schedule Interview
+                                </button>
+                            {% endif %}
+                            {% if application.status != 'Shortlisted' %}
+                                <button type="submit" name="status" value="Shortlisted" class="btn btn-sm btn-info" title="Add to Shortlist">
+                                    <i class="fas fa-star"></i> Shortlist
+                                </button>
+                            {% endif %}
+                            {% if application.status not in ['Reviewed', 'Interview', 'Shortlisted'] %}
+                                <button type="submit" name="status" value="Reviewed" class="btn btn-sm btn-warning" title="Mark as Reviewed">
+                                    <i class="fas fa-check"></i> Mark Reviewed
+                                </button>
+                            {% endif %}
+                            {% if application.status != 'Rejected' %}
+                                <button type="submit" name="status" value="Rejected" class="btn btn-sm btn-danger" title="Reject Application" 
+                                        onclick="return confirm('Are you sure you want to reject this application?')">
+                                    <i class="fas fa-times"></i> Reject
+                                </button>
+                            {% endif %}
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <i class="fas fa-inbox"></i>
+            <h2>No Applications Yet</h2>
+            <p>No candidates have applied for this position yet.</p>
+        </div>
+    {% endif %}
+
+    <div class="back-link">
+        <a href="/company"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+    </div>
+</div>
+
+<style>
+.applicant-rank {
+    margin-right: 15px;
+}
+
+.rank-badge {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.1rem;
+    box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
+}
+
+.top-candidate {
+    border-left: 4px solid #10b981;
+    background: linear-gradient(to right, #f0fdf4, white);
+}
+
+.high-match {
+    border-left: 4px solid #3b82f6;
+}
+
+.badge-icon {
+    font-size: 1.2rem;
+    margin-left: 8px;
+}
+
+.status-indicator {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-left: 15px;
+}
+
+.status-pending {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.status-reviewed {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.status-shortlisted {
+    background: #fce7f3;
+    color: #9f1239;
+}
+
+.status-interview {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.status-rejected {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.hr-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+}
+
+.hr-actions button {
+    margin: 0;
+}
+
+.applicant-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,15 @@
+Flask==3.0.0
+Flask-SQLAlchemy==3.1.1
+gunicorn==21.2.0
+Werkzeug==3.0.1
+
+# Document parsing
+PyPDF2==3.0.1
+python-docx==1.1.0
+
+# NLP - lightweight only
+nltk==3.8.1
+
+# ML - essential only (versions with pre-built wheels)
+scikit-learn==1.5.2
+numpy==1.26.4

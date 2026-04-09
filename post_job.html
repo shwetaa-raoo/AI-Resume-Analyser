@@ -1,0 +1,232 @@
+{% extends "base.html" %}
+
+{% block title %}Post Job{% endblock %}
+
+{% block content %}
+
+<style>
+
+.post-header{
+    background:linear-gradient(135deg,#6366f1,#4f46e5);
+    color:white;
+    text-align:center;
+    padding:60px 20px;
+}
+
+.post-container{
+    max-width:1100px;
+    margin:auto;
+    padding:40px 20px;
+}
+
+.form-layout{
+    display:grid;
+    grid-template-columns:2fr 1fr;
+    gap:30px;
+}
+
+.job-form-card{
+    background:white;
+    padding:30px;
+    border-radius:10px;
+    box-shadow:0 4px 20px rgba(0,0,0,0.08);
+}
+
+.form-row{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+}
+
+.form-group{
+    margin-bottom:20px;
+}
+
+.form-group label{
+    font-weight:600;
+    display:block;
+    margin-bottom:6px;
+}
+
+.form-control{
+    width:100%;
+    padding:10px;
+    border:1px solid #ddd;
+    border-radius:6px;
+}
+
+textarea.form-control{
+    resize:vertical;
+}
+
+.form-actions{
+    display:flex;
+    gap:10px;
+    margin-top:20px;
+}
+
+.btn-primary{
+    background:#4f46e5;
+    color:white;
+    padding:10px 18px;
+    border-radius:6px;
+    border:none;
+    cursor:pointer;
+}
+
+.btn-secondary{
+    border:1px solid #ccc;
+    padding:10px 18px;
+    border-radius:6px;
+    text-decoration:none;
+}
+
+.tips-card{
+    background:white;
+    padding:25px;
+    border-radius:10px;
+    box-shadow:0 4px 20px rgba(0,0,0,0.08);
+    height:fit-content;
+}
+
+.tips-card h3{
+    margin-bottom:15px;
+}
+
+.tips-card ul{
+    padding-left:18px;
+}
+
+.tips-card li{
+    margin-bottom:10px;
+    color:#555;
+}
+
+@media(max-width:900px){
+
+.form-layout{
+grid-template-columns:1fr;
+}
+
+.form-row{
+grid-template-columns:1fr;
+}
+
+}
+
+</style>
+
+
+
+<div class="post-header">
+    <h1>Post a New Job</h1>
+    <p>Create a job posting and find the perfect candidate</p>
+</div>
+
+
+<div class="post-container">
+
+<div class="form-layout">
+
+
+<!-- JOB FORM -->
+
+<div class="job-form-card">
+
+<form method="POST">
+
+<div class="form-row">
+
+<div class="form-group">
+<label>Job Title *</label>
+<input type="text" name="title" required class="form-control"
+placeholder="e.g. Senior Python Developer">
+</div>
+
+<div class="form-group">
+<label>Company *</label>
+<input type="text" name="company" required class="form-control"
+placeholder="e.g. Google, Microsoft">
+</div>
+
+</div>
+
+
+<div class="form-row">
+
+<div class="form-group">
+<label>Location</label>
+<input type="text" name="location" class="form-control"
+placeholder="Delhi / Remote">
+</div>
+
+<div class="form-group">
+<label>Experience</label>
+<input type="text" name="experience" class="form-control"
+placeholder="e.g. 2-4 years">
+</div>
+
+</div>
+
+
+<div class="form-group">
+<label>Salary Range</label>
+<input type="text" name="salary_range" class="form-control"
+placeholder="₹6L - ₹12L">
+</div>
+
+
+<div class="form-group">
+<label>Job Description *</label>
+<textarea name="description" required rows="7" class="form-control"
+placeholder="Describe the job role, responsibilities, requirements, and expectations..."></textarea>
+</div>
+
+
+<div class="form-group">
+<label>Required Skills *</label>
+<textarea name="required_skills" required rows="4" class="form-control"
+placeholder="Python, Flask, Django, SQL, AWS, Docker"></textarea>
+</div>
+
+
+<div class="form-actions">
+
+<a href="/company" class="btn-secondary">
+Cancel
+</a>
+
+<button type="submit" class="btn-primary">
+Post Job
+</button>
+
+</div>
+
+</form>
+
+</div>
+
+
+
+<!-- TIPS PANEL -->
+
+<div class="tips-card">
+
+<h3>Job Posting Tips</h3>
+
+<ul>
+<li>Use clear job titles</li>
+<li>Add specific skills for better AI matching</li>
+<li>Include salary range to attract candidates</li>
+<li>Explain responsibilities clearly</li>
+<li>Keep job requirements realistic</li>
+</ul>
+
+</div>
+
+
+</div>
+
+</div>
+
+{% endblock %}

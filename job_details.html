@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}{{ job.title }} - Job Details{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="container">
+        <h1>{{ job.title }}</h1>
+        <p class="company-name"><i class="fas fa-building"></i> {{ job.company }}</p>
+    </div>
+</div>
+
+<div class="container">
+    <div class="job-details-wrapper">
+        <div class="job-main-content">
+            <div class="job-detail-card">
+                <div class="job-meta">
+                    {% if job.location %}
+                    <div class="meta-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <div>
+                            <strong>Location</strong>
+                            <p>{{ job.location }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if job.experience %}
+                    <div class="meta-item">
+                        <i class="fas fa-briefcase"></i>
+                        <div>
+                            <strong>Experience</strong>
+                            <p>{{ job.experience }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if job.salary_range %}
+                    <div class="meta-item">
+                        <i class="fas fa-money-bill-wave"></i>
+                        <div>
+                            <strong>Salary Range</strong>
+                            <p>{{ job.salary_range }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="meta-item">
+                        <i class="fas fa-clock"></i>
+                        <div>
+                            <strong>Posted</strong>
+                            <p>{{ job.posted_date.strftime('%B %d, %Y') }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="job-section">
+                    <h3><i class="fas fa-file-alt"></i> Job Description</h3>
+                    <p class="job-description-text">{{ job.description }}</p>
+                </div>
+
+                <div class="job-section">
+                    <h3><i class="fas fa-tasks"></i> Required Skills</h3>
+                    <div class="skills-tags">
+                        {% set skills = job.required_skills.split(',') %}
+                        {% for skill in skills %}
+                            <span class="skill-tag">{{ skill.strip() }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="job-sidebar">
+            <div class="apply-card">
+                <h3>Interested in this position?</h3>
+                <p>Upload your resume and get an instant match score!</p>
+                <a href="/apply/{{ job.id }}" class="btn btn-primary btn-lg btn-block">
+                    <i class="fas fa-paper-plane"></i> Apply Now
+                </a>
+            </div>
+
+            <div class="info-card">
+                <h4><i class="fas fa-info-circle"></i> How it works</h4>
+                <ol class="steps-list">
+                    <li>Upload your resume (PDF or DOCX)</li>
+                    <li>Our AI analyzes your skills</li>
+                    <li>Get instant match score & feedback</li>
+                    <li>Submit your application</li>
+                </ol>
+            </div>
+
+            <div class="stats-card">
+                <h4><i class="fas fa-chart-bar"></i> Job Statistics</h4>
+                <div class="stat-item">
+                    <span class="stat-value">{{ job.applications|length }}</span>
+                    <span class="stat-label">Applications</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value">{{ (job.required_skills.split(',')|length) }}</span>
+                    <span class="stat-label">Required Skills</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="back-link">
+        <a href="/candidate"><i class="fas fa-arrow-left"></i> Back to Job Listings</a>
+    </div>
+</div>
+{% endblock %}

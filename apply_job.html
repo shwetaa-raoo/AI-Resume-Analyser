@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}Apply for {{ job.title }} - Resume Analyzer{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="container">
+        <h1>Apply for {{ job.title }}</h1>
+        <p class="company-name">{{ job.company }}</p>
+    </div>
+</div>
+
+<div class="container">
+    <div class="application-form-wrapper">
+        <div class="job-summary-card">
+            <h3>Job Summary</h3>
+            <div class="job-info">
+                {% if job.location %}
+                <p><i class="fas fa-map-marker-alt"></i> <strong>Location:</strong> {{ job.location }}</p>
+                {% endif %}
+                {% if job.experience %}
+                <p><i class="fas fa-briefcase"></i> <strong>Experience:</strong> {{ job.experience }}</p>
+                {% endif %}
+                {% if job.salary_range %}
+                <p><i class="fas fa-money-bill-wave"></i> <strong>Salary:</strong> {{ job.salary_range }}</p>
+                {% endif %}
+            </div>
+            
+            <div class="required-skills-box">
+                <h4><i class="fas fa-tasks"></i> Required Skills</h4>
+                <div class="skills-tags">
+                    {% set skills = job.required_skills.split(',') %}
+                    {% for skill in skills %}
+                        <span class="skill-tag">{{ skill.strip() }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="application-form-card">
+            <h3><i class="fas fa-file-upload"></i> Submit Your Application</h3>
+            <p class="form-description">Upload your resume and our AI will analyze how well you match this position</p>
+            
+            <form method="POST" enctype="multipart/form-data" class="application-form">
+                <div class="form-group">
+                    <label for="name">Full Name *</label>
+                    <input type="text" id="name" name="name" required class="form-control">
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email Address *</label>
+                    <input type="email" id="email" name="email" required class="form-control">
+                </div>
+                
+              <div class="form-group">
+    <label for="phone">Phone Number *</label>
+    <input 
+        type="tel" 
+        id="phone" 
+        name="phone" 
+        class="form-control" 
+        maxlength="10"
+        oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+</div>
+                
+                <div class="form-group">
+                    <label for="resume">Upload Resume * (PDF or DOCX)</label>
+                    <div class="file-upload-wrapper">
+                        <input type="file" id="resume" name="resume" accept=".pdf,.docx,.doc" required class="form-control-file">
+                        <div class="file-upload-info">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <p>Drag and drop or click to upload</p>
+                            <span>Supported formats: PDF, DOCX (Max 16MB)</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <a href="/candidate" class="btn btn-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-paper-plane"></i> Submit Application
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // File upload preview
+    const fileInput = document.getElementById('resume');
+    const fileUploadInfo = document.querySelector('.file-upload-info p');
+    
+    fileInput.addEventListener('change', function(e) {
+        if (e.target.files.length > 0) {
+            const fileName = e.target.files[0].name;
+            fileUploadInfo.textContent = `Selected: ${fileName}`;
+        }
+    });
+</script>
+{% endblock %}
